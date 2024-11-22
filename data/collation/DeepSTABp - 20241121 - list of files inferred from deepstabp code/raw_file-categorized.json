@@ -1,0 +1,54 @@
+{
+  "cell": {
+    "Saccharomyces cerevisiae": [
+      "Saccharomyces cerevisiae cell.csv"
+    ],
+    "Escherichia coli": [
+      "Escherichia coli cells.csv"
+    ],
+    "Homo sapiens": [
+      "Homo sapiens K562 cells_Thermal_proximity_coaggregationhermal_proximity_coaggregation.csv"
+    ],
+    "Thermus thermophilus": [
+      "Thermus thermophilus HB27 cells.csv"
+    ]
+  },
+  "lysate": {
+    "Oleispira antarctica": [
+      "Oleispira antarctica_RB-8_lysate_R1.csv"
+    ],
+    "Caenorhabditis elegans": [
+      "Caenorhabditis elegans lysate.csv"
+    ],
+    "Arabidopsis thaliana": [
+      "Arabidopsis thaliana seedling lysate.csv"
+    ],
+    "Drosophila melanogaster": [
+      "Drosophila melanogaster SII lysate.csv"
+    ],
+    "Danio rerio": [
+      "Danio rerio Zenodo lysate.csv"
+    ],
+    "Saccharomyces cerevisiae": [
+      "Saccharomyces cerevisiae lysate.csv"
+    ],
+    "Bacillus subtilis": [
+      "Bacillus subtilis_168_lysate_R1.csv"
+    ],
+    "Escherichia coli": [
+      "Escherichia coli lysate.csv"
+    ],
+    "Homo sapiens": [
+      "Homo sapiens K562 lysate_Thermal_proximity_coaggregationhermal_proximity_coaggregation.csv"
+    ],
+    "Mus musculus": [
+      "Mus musculus BMDC lysate.csv"
+    ],
+    "Picrophilus torridus": [
+      "Picrophilus torridus DSM9790 lysate.csv"
+    ],
+    "Thermus thermophilus": [
+      "Thermus thermophilus HB27 lysate.csv"
+    ]
+  }
+}

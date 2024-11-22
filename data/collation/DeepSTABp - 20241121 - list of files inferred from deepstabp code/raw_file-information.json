@@ -1,0 +1,66 @@
+{
+  "Arabidopsis thaliana seedling lysate.csv": {
+    "species": "Arabidopsis thaliana",
+    "exp_type": "lysate"
+  },
+  "Bacillus subtilis_168_lysate_R1.csv": {
+    "species": "Bacillus subtilis",
+    "exp_type": "lysate"
+  },
+  "Caenorhabditis elegans lysate.csv": {
+    "species": "Caenorhabditis elegans",
+    "exp_type": "lysate"
+  },
+  "Danio rerio Zenodo lysate.csv": {
+    "species": "Danio rerio",
+    "exp_type": "lysate"
+  },
+  "Drosophila melanogaster SII lysate.csv": {
+    "species": "Drosophila melanogaster",
+    "exp_type": "lysate"
+  },
+  "Escherichia coli cells.csv": {
+    "species": "Escherichia coli",
+    "exp_type": "cell"
+  },
+  "Escherichia coli lysate.csv": {
+    "species": "Escherichia coli",
+    "exp_type": "lysate"
+  },
+  "Homo sapiens K562 cells_Thermal_proximity_coaggregationhermal_proximity_coaggregation.csv": {
+    "species": "Homo sapiens",
+    "exp_type": "cell"
+  },
+  "Homo sapiens K562 lysate_Thermal_proximity_coaggregationhermal_proximity_coaggregation.csv": {
+    "species": "Homo sapiens",
+    "exp_type": "lysate"
+  },
+  "Mus musculus BMDC lysate.csv": {
+    "species": "Mus musculus",
+    "exp_type": "lysate"
+  },
+  "Oleispira antarctica_RB-8_lysate_R1.csv": {
+    "species": "Oleispira antarctica",
+    "exp_type": "lysate"
+  },
+  "Picrophilus torridus DSM9790 lysate.csv": {
+    "species": "Picrophilus torridus",
+    "exp_type": "lysate"
+  },
+  "Saccharomyces cerevisiae cell.csv": {
+    "species": "Saccharomyces cerevisiae",
+    "exp_type": "cell"
+  },
+  "Saccharomyces cerevisiae lysate.csv": {
+    "species": "Saccharomyces cerevisiae",
+    "exp_type": "lysate"
+  },
+  "Thermus thermophilus HB27 cells.csv": {
+    "species": "Thermus thermophilus",
+    "exp_type": "cell"
+  },
+  "Thermus thermophilus HB27 lysate.csv": {
+    "species": "Thermus thermophilus",
+    "exp_type": "lysate"
+  }
+}

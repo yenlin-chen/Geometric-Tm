@@ -1,0 +1,15 @@
+{
+    "Oleispira antarctica": 3,
+    "Caenorhabditis elegans": 20,
+    "Arabidopsis thaliana": 22 ,
+    "Drosophila melanogaster": 25 ,
+    "Danio rerio": 28,
+    "Saccharomyces cerevisiae": 32,
+    "Bacillus subtilis": 37,
+    "Escherichia coli": 37,
+    "Homo sapiens": 37,
+    "Mus musculus": 37,
+    "Geobacillus stearothermophilus": 55,
+    "Picrophilus torridus": 60,
+    "Thermus thermophilus": 70
+}
