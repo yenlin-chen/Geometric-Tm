@@ -49,7 +49,7 @@ class Dataset(pyg.data.Dataset):
         entries_should_be_ready=False,
         # abort_on_process=False,
         rebuild=False,
-        float16_embeddings=False
+        float16_embeddings=False,
     ):
 
         self.device = device
@@ -85,7 +85,7 @@ class Dataset(pyg.data.Dataset):
         # )
         if not self.entries_should_be_ready:
             os.makedirs(
-                        self.graph_dir, exist_ok=not self.entries_should_be_ready
+                self.graph_dir, exist_ok=not self.entries_should_be_ready
             )
             os.makedirs(
                 self.embedding_dir, exist_ok=not self.entries_should_be_ready
@@ -266,9 +266,7 @@ class Dataset(pyg.data.Dataset):
         successful_accessions, _ = self.tnm_computer.batch_run(
             modified_downloadable,
             pdb_path_list,
-            merge_output_files=True,  # merge small files into one
             timeout=self.time_limit,  # increase if necessary
-            debug=False,  # set to true if can't shutil.rmtree() on WSL
         )
 
         print(
@@ -340,9 +338,13 @@ class Dataset(pyg.data.Dataset):
 
         ### INSTANTIATE ENCODERS (TO BE DELETED AFTER USE)
         if self.sequence_embedding == 'proteinbert':
-            encoder = ProteinBERT_Encoder(float16_embeddings=self.float16_embeddings)
+            encoder = ProteinBERT_Encoder(
+                float16_embeddings=self.float16_embeddings
+            )
         elif self.sequence_embedding == 'prottrans':
-            encoder = ProtTrans_Encoder(float16_embeddings=self.float16_embeddings)
+            encoder = ProtTrans_Encoder(
+                float16_embeddings=self.float16_embeddings
+            )
         else:
             raise ValueError(f'Invalid encoder {self.sequence_embedding}')
 
@@ -577,7 +579,9 @@ class Dataset(pyg.data.Dataset):
             embedding_file = os.path.join(self.embedding_dir, f'{accession}.pt')
 
             if self.rebuild or not os.path.exists(graph_file):
-                torch.save(data, os.path.join(self.graph_dir, f'{accession}.pt'))
+                torch.save(
+                    data, os.path.join(self.graph_dir, f'{accession}.pt')
+                )
             if self.rebuild or not os.path.exists(embedding_file):
                 torch.save(
                     encoder(sequence),
@@ -609,20 +613,20 @@ class Dataset(pyg.data.Dataset):
 
 if __name__ == '__main__':
 
-    metafile = '../../../data/collation/DeepTM/benchmark_set-2.csv'
+    set_name = 'DeepSTABp-all (raw)'
+    metafile = f'stats - {set_name}/metadata - {set_name}.csv'
 
     edge_policy = '1CONT'
-
     thresholds = {
         'contact': '12',
         'codir': edge_policy,
         'coord': edge_policy,
         'deform': edge_policy,
     }
-    dataset_version = 'v7-variable_thresholds'
+    dataset_version = 'v8-final_build'
     embedding = 'prottrans'
 
-    include_edge_weights = any([t == 'NONE' for t in thresholds.values()])
+    # include_edge_weights = any([t == 'NONE' for t in thresholds.values()])
 
     print(metafile)
 
@@ -640,6 +644,9 @@ if __name__ == '__main__':
         time_limit=60,
         transform=None,
         device=df_device,
+        entries_should_be_ready=False,
+        rebuild=False,
+        float16_embeddings=True,
     )
 
     print(len(test_set))

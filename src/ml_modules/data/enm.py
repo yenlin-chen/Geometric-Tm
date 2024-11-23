@@ -22,6 +22,7 @@ class TNM_Computer:
     ):
 
         self.tnm_dir = os.path.join(collation_dir, 'TNM')
+        self.setup_name = f'run-sigma{n_sigmas}'
 
         failure_filename = 'tnm-failed_entries.tsv'
         self.failure_path = os.path.join(self.tnm_dir, failure_filename)
@@ -54,9 +55,7 @@ class TNM_Computer:
             return np.unique(entries[:, 0])
 
     def path_to_work(self, accession):
-        return os.path.join(
-            self.tnm_dir, f'run-sigma{self.n_sigmas}', accession
-        )
+        return os.path.join(self.tnm_dir, self.setup_name, accession)
 
     def path_to_outputs(self, accession):
 
@@ -75,15 +74,13 @@ class TNM_Computer:
         return {k: os.path.join(work_dir, filenames[k]) for k in filenames}
 
     def path_to_merged(self, accession):
-        return os.path.join(self.path_to_work(accession), 'output.json')
+        return os.path.join(self.tnm_dir, self.setup_name, f'{accession}.json')
 
     def run(
         self,
         accession,
         pdb_path,
-        merge_output_files=True,
         timeout=60,
-        debug=False,
     ):
 
         '''Runs TNM program on a given protein structure.
@@ -94,12 +91,8 @@ class TNM_Computer:
             PDB accession code.
         pdb_path : str
             Path to PDB file.
-        merge_output_files : bool, optional
-            If True, merge output files into one .json file.
         timeout : int, optional
             Maximum time (in seconds) to wait for the program to finish.
-        debug : bool, optional
-            If True, the working directory is not deleted in case of failure.
 
         Returns
         -------
@@ -108,7 +101,6 @@ class TNM_Computer:
         '''
 
         work_dir = self.path_to_work(accession)
-        os.makedirs(work_dir, exist_ok=True)
         script_file = os.path.join(work_dir, 'tnm.in')
         tnm_log_file = os.path.join(work_dir, 'tnm.log')
 
@@ -118,13 +110,13 @@ class TNM_Computer:
         # check if program output exists
         ################################################################
         # check if merged file exists
-        if merge_output_files and os.path.exists(
-            self.path_to_merged(accession)
-        ):
+        if os.path.exists(self.path_to_merged(accession)):
             return work_dir
+        else:
+            os.makedirs(work_dir, exist_ok=True)
 
         # check if execution is successful by reading log file
-        if os.path.exists(tnm_log_file):
+        if os.path.exists(tnm_log_file) and os.stat(tnm_log_file).st_size != 0:
             with open(tnm_log_file, 'r') as f:
                 final_line = f.readlines()[-1]
         else:
@@ -135,9 +127,8 @@ class TNM_Computer:
             path_to_file = path_to_files[key]
             file_existence.append(os.path.exists(path_to_file))
 
-        if all(file_existence) and final_line.startswith('Dynamical coupling'):
-            if merge_output_files:
-                self.merge_output_file(accession)
+        if all(file_existence) and final_line.startswith('Total Time'):
+            self.merge_output_file(accession)
             return work_dir
 
         ################################################################
@@ -164,13 +155,14 @@ class TNM_Computer:
         os.chdir(work_dir)
         try:
             # tnm software must be in PATH
-            subprocess.run(['tnm', script_file], stdout=f_log, timeout=timeout)
+            subprocess.run(
+                ['tnm', '-file', script_file], stdout=f_log, timeout=timeout
+            )
         except subprocess.TimeoutExpired as err:
             # timeouts are considered failures
             os.chdir(cwd)
             f_log.close()
-            if debug == False:
-                shutil.rmtree(work_dir)
+            shutil.rmtree(work_dir)
             with open(self.failure_path, 'a+') as f:
                 f.write(
                     f'{accession}\t'
@@ -190,9 +182,8 @@ class TNM_Computer:
         # check if execution is successful by reading log file
         with open(tnm_log_file, 'r') as f:
             final_line = f.readlines()[-1]
-        if not final_line.startswith('Dynamical coupling.'):
-            if debug == False:
-                shutil.rmtree(work_dir)
+        if not final_line.startswith('Total Time'):
+            shutil.rmtree(work_dir)
             with open(self.failure_path, 'a+') as f:
                 f.write(f'{accession}\tincomplete execution\n')
             return None
@@ -202,15 +193,13 @@ class TNM_Computer:
             path_to_file = path_to_files[key]
             file_existence.append(os.path.exists(path_to_file))
         if not all(file_existence):
-            if debug == False:
-                shutil.rmtree(work_dir)
+            shutil.rmtree(work_dir)
             with open(self.failure_path, 'a+') as f:
                 f.write(f'{accession}\tmissing files\n')
             return None
 
         if os.path.exists(work_dir):
-            if merge_output_files:
-                self.merge_output_file(accession)
+            self.merge_output_file(accession)
             return work_dir
         else:
             with open(self.failure_path, 'a+') as f:
@@ -221,10 +210,8 @@ class TNM_Computer:
         self,
         accessions,
         pdb_path_list,
-        merge_output_files=True,
         retry=False,
         timeout=60,
-        debug=False,
     ):
 
         '''Executes TNM software on a list of protein accessions.
@@ -238,14 +225,8 @@ class TNM_Computer:
             List of PDB accession codes.
         pdb_path_list : list of str
             List of paths to PDB files.
-        merge_output_files : bool
-            If True, merge output files into one .json file.
         retry : bool
             If True, retry failed accessions.
-        debug : bool
-            If True, do not delete directories containing failed entries.
-            Directory removal does not work in Windows WSL (PermissionError),
-            hence must be set to `True` when running on windows.
         '''
 
         successful_accessions = []
@@ -268,9 +249,7 @@ class TNM_Computer:
             work_dir = self.run(
                 accession=accession,
                 pdb_path=pdb_path,
-                merge_output_files=merge_output_files,
                 timeout=timeout,
-                debug=debug,
             )
             if work_dir is not None:
                 successful_accessions.append(accession)
@@ -289,7 +268,7 @@ class TNM_Computer:
 
         return successful_accessions, failed_accessions
 
-    def merge_output_file(self, accession, remove_merged_files=True):
+    def merge_output_file(self, accession):
         '''Merge output files generated by TNM program.
 
         Parameters
@@ -319,9 +298,7 @@ class TNM_Computer:
                 sort_keys=True,
             )
 
-        if remove_merged_files:
-            for filename in filenames:
-                os.remove(os.path.join(path_to_work, filename))
+        shutil.rmtree(path_to_work)
 
     def cleanup_failed(self):
         '''Remove directories of failed entries. Does not work in Windows WSL.'''
@@ -403,28 +380,33 @@ if __name__ == '__main__':
 
     tnm_computer = TNM_Computer()
 
-    # # PROCESS A LIST OF ENTRIES
-    # set_name = 'DeepSTABp-all (raw)'
-    # stats_dir = f'stats - {set_name}'
+    # PROCESS A LIST OF ENTRIES
+    set_name = 'DeepSTABp-all (raw)'
+    stats_dir = f'stats - {set_name}'
 
-    # accessions = np.loadtxt(
-    #     f'{stats_dir}/accessions - {set_name}.txt',
-    #     dtype=np.str_
+    accessions = np.loadtxt(
+        f'{stats_dir}/accessions - {set_name}.csv', dtype=np.str_
+    )[:5]
+    mod_accessions = [f'{acc}-AFv4' for acc in accessions]
+    pdb_path_list = [
+        f'../../../../../data/external/AlphaFoldDB/pdb/{mod_acc}.pdb'
+        for mod_acc in mod_accessions
+    ]
+
+    # work_dir = tnm_computer.run(
+    #     accession=mod_accessions[1],
+    #     pdb_path=pdb_path_list[1],
+    #     timeout=60,
     # )
 
-    # root = '/Users/sebastian/Dropbox/projects/ai-thermostability/code/data/external/AlphaFoldDB/pdb'
-    # accessions = ['Q6ZS30-AFv4', 'D6RIN3-AFv4', 'D6RE34-AFv4', 'E5RJZ4-AFv4', 'H3BS66-AFv4', 'Q93HR1-AFv4', 'H2L294-AFv4', 'K7EKI6-AFv4', 'E9QG37-AFv4']
-    # pdb_path_list = [os.path.join(root, accession+'.pdb') for accession in accessions]
+    successful, failed = tnm_computer.batch_run(
+        mod_accessions, pdb_path_list, retry=False
+    )
 
-    # successful, failed = tnm_computer.batch_run(accessions,
-    #                                          pdb_path_list,
-    #                                          retry=False)
+    print(successful)
+    print(failed)
 
-    # print(successful)
-    # print(failed)
-
-
-    # REMOVE FAILED ENTRIES, INCLUDING DIRECTORIES
-    removed_accessions = tnm_computer.cleanup_failed()
-    print(removed_accessions)
-    print(len(removed_accessions))
+    # # REMOVE FAILED ENTRIES, INCLUDING DIRECTORIES
+    # removed_accessions = tnm_computer.cleanup_failed()
+    # print(removed_accessions)
+    # print(len(removed_accessions))
