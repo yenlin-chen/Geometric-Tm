@@ -77,7 +77,7 @@ def main():
     # EXPERIMENT SETUP
     ####################################################################
 
-    tv_set_name = 'sandbox_1280'
+    tv_set_name = 'sandbox_50 (example)'
     test_set_name = 'old DeepSTABp-lysates dataset (test set), available from dp180'
 
     loss_type = 'mse'
