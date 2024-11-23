@@ -139,8 +139,8 @@ class Trainer:
             for j, a in enumerate(data_batch.accession):
                 batch_Tm[j] = Tm_dict[a]
             # batch_Tm = data_batch.Tm
-            # true = (batch_Tm[:pred.numel()] - self.val_mean) / self.val_std
-            true = (batch_Tm - self.val_mean) / self.val_std
+            true = (batch_Tm[:pred.numel()] - self.val_mean) / self.val_std
+            # true = (batch_Tm - self.val_mean) / self.val_std
             loss = self.loss_fn(pred, true)
             # backpropagate
             loss.backward()
@@ -227,7 +227,8 @@ class Trainer:
             for j, a in enumerate(data_batch.accession):
                 batch_Tm[j] = Tm_dict[a]
             # batch_Tm = data_batch.Tm
-            true = (batch_Tm - self.val_mean) / self.val_std
+            true = (batch_Tm[:pred.numel()] - self.val_mean) / self.val_std
+            # true = (batch_Tm - self.val_mean) / self.val_std
             total_loss += self.loss_fn(pred, true).item()
 
             ### gather model outputs and labels
