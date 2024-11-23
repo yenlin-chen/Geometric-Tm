@@ -1,4 +1,4 @@
-# Tm Prediction with Protein Dynamics-informed Graphs
+# Tm Prediction with Protein Dynamics-informed GNN
 
 ## Training and evaluation
 Go to `experiments/sandbox_50 (example)/v7a-the_fold/contact_12` and run `train-10fold.py`.
