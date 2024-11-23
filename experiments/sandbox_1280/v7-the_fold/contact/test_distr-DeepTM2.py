@@ -35,8 +35,8 @@ def main():
     edge_types_to_use = ['contact']
     edge_policy = '0.5DCONT'
 
-    dataset_version = 'v7-variable_thresholds'
-    entries_should_be_ready = True
+    dataset_version = 'v7a'
+    entries_should_be_ready = False
 
     transform = None
 

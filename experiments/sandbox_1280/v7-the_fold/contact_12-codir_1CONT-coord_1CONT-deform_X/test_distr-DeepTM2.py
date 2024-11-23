@@ -29,12 +29,10 @@ def seed_worker(worker_id):
 # for multiprocessing
 def main():
 
-    test_set_name = (
-        'old DeepSTABp-lysates dataset (test set), available from dp180'
-    )
+    test_set_name = 'DeepTM benchmark set 2, available from dp180'
 
-    model_type = 'SimplifiedMultiGCN'  # SimplifiedMultiGCN or mGCN
-    edge_types_to_use = ['contact']
+    model_type = 'mGCN'  # SimplifiedMultiGCN or mGCN
+    edge_types_to_use = ['contact', 'codir', 'coord']
     edge_policy = '0.5DCONT'
 
     dataset_version = 'v7a'

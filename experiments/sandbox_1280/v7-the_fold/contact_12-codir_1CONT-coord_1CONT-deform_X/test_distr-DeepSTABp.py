@@ -33,8 +33,8 @@ def main():
         'old DeepSTABp-lysates dataset (test set), available from dp180'
     )
 
-    model_type = 'SimplifiedMultiGCN'  # SimplifiedMultiGCN or mGCN
-    edge_types_to_use = ['contact']
+    model_type = 'mGCN'  # SimplifiedMultiGCN or mGCN
+    edge_types_to_use = ['contact', 'codir', 'coord']
     edge_policy = '0.5DCONT'
 
     dataset_version = 'v7a'

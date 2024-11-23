@@ -28,8 +28,8 @@ def seed_worker(worker_id):
 # for multiprocessing
 def main():
 
-    model_type = 'SimplifiedMultiGCN'  # SimplifiedMultiGCN or mGCN
-    edge_types_to_use = ['contact']
+    model_type = 'mGCN'  # SimplifiedMultiGCN or mGCN
+    edge_types_to_use = ['contact', 'codir', 'coord']
     edge_policy = '0.5DCONT'
 
     fold_file = '../the fold.json'
