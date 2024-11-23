@@ -34,5 +34,6 @@ Python packages requried:
 - scikit-learn
 - transformers
 - sentencepiece
+
 Additional dependencies:
-- TNM (https://github.com/ugobas/tnm)
+- [TNM](https://github.com/ugobas/tnm) (accessed Nov 23, 2024)
