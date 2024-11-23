@@ -103,10 +103,10 @@ class Trainer:
         # information on train_loader
         train_size = len(train_loader.dataset)
         batch_size = train_loader.batch_size
-        # if isinstance(train_loader.dataset, torch.utils.data.dataset.Subset):
-        #     Tm_dict = train_loader.dataset.dataset.Tm_dict
-        # else:
-        #     Tm_dict = train_loader.dataset.Tm_dict
+        if isinstance(train_loader.dataset, torch.utils.data.dataset.Subset):
+            Tm_dict = train_loader.dataset.dataset.Tm_dict
+        else:
+            Tm_dict = train_loader.dataset.Tm_dict
 
         # set model to training mode
         self.model.train()
@@ -119,9 +119,9 @@ class Trainer:
         labels = torch.zeros(
             (train_size,), dtype=torch.float32, device=self.device
         )
-        # batch_Tm = torch.zeros((batch_size,),
-        #                        dtype=torch.float32,
-        #                        device=self.device)
+        batch_Tm = torch.zeros(
+            (batch_size,), dtype=torch.float32, device=self.device
+        )
         accessions = np.empty((train_size,), dtype='U16')
         for i, data_batch in enumerate(train_loader):
 
@@ -136,10 +136,9 @@ class Trainer:
 
             ### compute the loss and its gradients
             # standardize true labels to mean 0 and std 1
-            # for j, a in enumerate(data_batch.accession):
-            #     batch_Tm[j] = Tm_dict[a]
-            # data_batch.Tm = batch_Tm
-            batch_Tm = data_batch.Tm
+            for j, a in enumerate(data_batch.accession):
+                batch_Tm[j] = Tm_dict[a]
+            # batch_Tm = data_batch.Tm
             # true = (batch_Tm[:pred.numel()] - self.val_mean) / self.val_std
             true = (batch_Tm - self.val_mean) / self.val_std
             loss = self.loss_fn(pred, true)
@@ -196,10 +195,10 @@ class Trainer:
         # information on dataset
         dataset_size = len(dataloader.dataset)
         batch_size = dataloader.batch_size
-        # if isinstance(dataloader.dataset, torch.utils.data.dataset.Subset):
-        #     Tm_dict = dataloader.dataset.dataset.Tm_dict
-        # else:
-        #     Tm_dict = dataloader.dataset.Tm_dict
+        if isinstance(dataloader.dataset, torch.utils.data.dataset.Subset):
+            Tm_dict = dataloader.dataset.dataset.Tm_dict
+        else:
+            Tm_dict = dataloader.dataset.Tm_dict
 
         # set model to evaluation mode
         self.model.eval()
@@ -212,9 +211,9 @@ class Trainer:
         labels = torch.zeros(
             (dataset_size,), dtype=torch.float32, device=self.device
         )
-        # batch_Tm = torch.zeros((batch_size,),
-        #                        dtype=torch.float32,
-        #                        device=self.device)
+        batch_Tm = torch.zeros(
+            (batch_size,), dtype=torch.float32, device=self.device
+        )
         accessions = np.empty((dataset_size,), dtype='U16')
         for i, data_batch in enumerate(dataloader):
 
@@ -225,9 +224,9 @@ class Trainer:
 
             ### compute loss
             # standardize true labels to mean 0 and std 1
-            # for j, a in enumerate(data_batch.accession):
-            #     batch_Tm[j] = Tm_dict[a]
-            batch_Tm = data_batch.Tm
+            for j, a in enumerate(data_batch.accession):
+                batch_Tm[j] = Tm_dict[a]
+            # batch_Tm = data_batch.Tm
             true = (batch_Tm - self.val_mean) / self.val_std
             total_loss += self.loss_fn(pred, true).item()
 
