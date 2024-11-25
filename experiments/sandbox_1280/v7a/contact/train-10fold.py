@@ -34,7 +34,7 @@ def main():
 
     fold_file = '../the fold.json'
 
-    dataset_version = 'v7-variable_thresholds'
+    dataset_version = 'v7a'
     entries_should_be_ready = False
 
     transform = None
@@ -78,7 +78,7 @@ def main():
     ####################################################################
 
     tv_set_name = 'sandbox_1280'
-    test_set_name = 'old DeepSTABp-lysates dataset (test set), available from dp180'
+    test_set_name = 'old DeepSTABp-lysates dataset (test set), available from dp180 - lysate_cell-0_1'
 
     loss_type = 'mse'
     metrics = {'pcc': pcc, 'rmse': rmse, 'mae': mae, 'mse': mse, 'r2': r2}
@@ -282,6 +282,13 @@ def main():
         train_acc = fold_acc['train'][str(fold_idx)]
         valid_acc = fold_acc['valid'][str(fold_idx)]
         # reverse engineer the indices
+        for acc in train_acc:
+            if acc not in tv_set.processable_accessions:
+                print(acc)
+
+        np.savetxt('train_acc.txt', train_acc, fmt='%s')
+        np.savetxt('tv_set.processable_accessions.txt', tv_set.processable_accessions, fmt='%s')
+
         train_idx = torch.tensor(
             [np.where(tv_set.processable_accessions == a)[0][0] for a in train_acc]
         )

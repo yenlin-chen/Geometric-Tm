@@ -30,14 +30,14 @@ def seed_worker(worker_id):
 def main():
 
     test_set_name = (
-        'old DeepSTABp-lysates dataset (test set), available from dp180'
+        'old DeepSTABp-lysates dataset (test set), available from dp180 - lysate_cell-0_1'
     )
 
     model_type = 'SimplifiedMultiGCN'  # SimplifiedMultiGCN or mGCN
     edge_types_to_use = ['contact']
     edge_policy = '0.5DCONT'
 
-    dataset_version = 'v7-variable_thresholds'
+    dataset_version = 'v7a'
     entries_should_be_ready = False
 
     transform = None
