@@ -16,7 +16,7 @@ else:
     from .encoders import ProtTrans_Encoder, ProteinBERT_Encoder
     from .persistence_image import PI_Computer
 
-import os, torch, prody, json
+import os, torch, prody, json, warnings
 import numpy as np
 import torch_geometric as pyg
 
@@ -603,10 +603,12 @@ class Dataset(pyg.data.Dataset):
 
         filename = f'{self.processable_accessions[idx]}.pt'
 
-        data = torch.load(os.path.join(self.graph_dir, filename))
-        data['residue'].x = torch.load(
-            os.path.join(self.embedding_dir, filename)
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter(action='ignore', category=FutureWarning)
+            data = torch.load(os.path.join(self.graph_dir, filename))
+            data['residue'].x = torch.load(
+                os.path.join(self.embedding_dir, filename)
+            )
 
         return data
 
