@@ -1,7 +1,26 @@
 *.pt
 data/collation/TNM/run*
-data/external/AlphaFoldDB/pdb/*
-data/processed/*
+data/collation/DeepSTABp\ (backup)
+data/external/AlphaFoldDB/pdb
+data/external/DeepTM
+data/external/meltome\ atlas
+data/processed
+experiments/*
+experiments/**/fold[0-9]
+!experiments/sandbox_1280
+!experiments/sandbox_896
+notebooks
+src/data_collation/backups*
+src/ml_modules/training/check_model_args.py
+src/ml_modules/training/model_arch-old.py
+src/ml_modules/training/predictor.py
+src/ml_modules/data/anm.py
+src/ml_modules/data/defunct\ -\ datasets.py
+src/ml_modules/data/trainer_v6v7.py
+
+
+# Finder files
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
