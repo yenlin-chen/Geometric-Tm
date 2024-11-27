@@ -30,7 +30,7 @@ def seed_worker(worker_id):
 def main():
 
     test_set_name = (
-        'old DeepSTABp-lysates dataset (test set), available from dp180'
+        'old DeepSTABp-lysates dataset (test set), available from dp180 - lysate_cell-0_1'
     )
 
     model_type = 'SimplifiedMultiGCN'  # SimplifiedMultiGCN or mGCN

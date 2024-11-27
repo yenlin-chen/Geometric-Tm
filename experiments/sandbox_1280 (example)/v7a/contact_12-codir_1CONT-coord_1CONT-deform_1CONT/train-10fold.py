@@ -28,9 +28,9 @@ def seed_worker(worker_id):
 # for multiprocessing
 def main():
 
-    model_type = 'SimplifiedMultiGCN'  # SimplifiedMultiGCN or mGCN
-    edge_types_to_use = ['contact']
-    edge_policy = '0.5DCONT'
+    model_type = 'mGCN'  # SimplifiedMultiGCN or mGCN
+    edge_types_to_use = ['contact', 'codir']
+    edge_policy = '1CONT'
 
     fold_file = '../the fold.json'
 
@@ -77,8 +77,8 @@ def main():
     # EXPERIMENT SETUP
     ####################################################################
 
-    tv_set_name = 'sandbox_50 (example)'
-    test_set_name = 'old DeepSTABp-lysates dataset (test set), available from dp180'
+    tv_set_name = 'sandbox_1280'
+    test_set_name = 'old DeepSTABp-lysates dataset (test set), available from dp180 - lysate_cell-0_1'
 
     loss_type = 'mse'
     metrics = {'pcc': pcc, 'rmse': rmse, 'mae': mae, 'mse': mse, 'r2': r2}
@@ -282,6 +282,13 @@ def main():
         train_acc = fold_acc['train'][str(fold_idx)]
         valid_acc = fold_acc['valid'][str(fold_idx)]
         # reverse engineer the indices
+        for acc in train_acc:
+            if acc not in tv_set.processable_accessions:
+                print(acc)
+
+        np.savetxt('train_acc.txt', train_acc, fmt='%s')
+        np.savetxt('tv_set.processable_accessions.txt', tv_set.processable_accessions, fmt='%s')
+
         train_idx = torch.tensor(
             [np.where(tv_set.processable_accessions == a)[0][0] for a in train_acc]
         )
