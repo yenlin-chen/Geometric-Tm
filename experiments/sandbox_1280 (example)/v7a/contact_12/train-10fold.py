@@ -286,9 +286,6 @@ def main():
             if acc not in tv_set.processable_accessions:
                 print(acc)
 
-        np.savetxt('train_acc.txt', train_acc, fmt='%s')
-        np.savetxt('tv_set.processable_accessions.txt', tv_set.processable_accessions, fmt='%s')
-
         train_idx = torch.tensor(
             [np.where(tv_set.processable_accessions == a)[0][0] for a in train_acc]
         )
