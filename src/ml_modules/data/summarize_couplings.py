@@ -231,7 +231,7 @@ def summarize_couplings(
 if __name__ == '__main__':
 
     # the threshold values are determined from this set
-    reference_set = 'old DeepSTABp-lysates dataset (train & valid set), available from dp180'
+    reference_set = 'sandbox_896 (reduced from 1280-cell_lysate_mixed)'
 
     stats_dir = f'stats - {reference_set}'
     ref_accessions = np.loadtxt(
