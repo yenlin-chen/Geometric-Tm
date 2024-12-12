@@ -41,6 +41,7 @@ class Dataset(pyg.data.Dataset):
         version,
         sequence_embedding,
         thresholds,
+        merge_edge_types=False,
         structure_source='AlphaFold',
         include_edge_weights=False,
         time_limit=60,
@@ -71,18 +72,25 @@ class Dataset(pyg.data.Dataset):
             f'coord_{thresholds["coord"]}-'
             f'deform_{thresholds["deform"]}'
         )
+        self.merge_edge_types = merge_edge_types
 
         ### COMMON DIRECTORIES
         self.v_process_dir = os.path.join(processed_dir, self.version)
-        self.graph_dir = os.path.join(  # for graphs
-            self.v_process_dir, 'graphs', self.threshold_name
-        )
+        if not merge_edge_types:
+            self.graph_dir = os.path.join(  # for graphs
+                self.v_process_dir, 'graphs', self.threshold_name
+            )
+        else:
+            self.graph_dir = os.path.join(  # for graphs
+                self.v_process_dir, 'graphs-merged', self.threshold_name
+            )
         self.embedding_dir = os.path.join(  # for sequence embeddings
             self.v_process_dir, 'sequence_embeddings', self.sequence_embedding
         )
         # self.pi_dir = os.path.join(  # for persistence images
         #     self.process_dir, 'persistence_images'
         # )
+
         if not self.entries_should_be_ready:
             os.makedirs(
                 self.graph_dir, exist_ok=not self.entries_should_be_ready
@@ -401,15 +409,26 @@ class Dataset(pyg.data.Dataset):
             ### BUILD CONTACT GRAPH WITH PRODY (ANM)
             # contact maps are built based on the position of Ca atoms
             anm = prody.ANM(name=f'{accession}_CA')
-            anm.buildHessian(atoms, cutoff=float(self.thresholds['contact']))
+            anm.buildHessian(
+                atoms,
+                cutoff=(
+                    float(self.thresholds['contact'])
+                    if self.thresholds['contact'] != 'X' else 12
+                ),
+            )
             cont = -anm.getKirchhoff().astype(np.int_)  # the Laplacian matrix
             # np.fill_diagonal(cont, 1) # contact map completed here (with loops)
             edge_index = np.argwhere(cont == 1).T  # undirected graph
-            data['residue', 'contact', 'residue'].edge_index = torch.from_numpy(
-                edge_index
-            )
             n_cont_edges = int(edge_index.shape[1] / 2)
-            threshold_values = {'contact': float(self.thresholds['contact'])}
+            if self.thresholds['contact'] != 'X':
+                data['residue', 'contact', 'residue'].edge_index = torch.from_numpy(
+                    edge_index
+                )
+                threshold_values = {
+                    'contact': float(self.thresholds['contact'])
+                }
+            else:
+                threshold_values = {'contact': 'n/a'}
 
             # ### ADD CONTACT EDGES FROM TNM
             # # for some accessions, TNM will generate a blank file for
@@ -498,6 +517,10 @@ class Dataset(pyg.data.Dataset):
                     )
                     threshold = np.sort(couplings)[-n_edges]
 
+                elif self.thresholds[ct].endswith('X'):
+                    threshold_values[ct] = 'n/a'
+                    continue
+
                 # elif self.thresholds[ct] == 'DEF':
                 #     raise NotImplementedError('DEF not implemented yet')
                 #     threshold = 'tnm default'
@@ -537,6 +560,43 @@ class Dataset(pyg.data.Dataset):
                     data[
                         'residue', ct, 'residue'
                     ].edge_weight = torch.from_numpy(couplings)
+
+            ### MERGE EDGES (IF SPECIFIED)
+            if self.merge_edge_types:
+                edge_types_to_merge = [
+                    k for k, v in self.thresholds.items() if v != 'X'
+                ]
+                data['residue', 'merged', 'residue'].edge_index = torch.unique(
+                    torch.cat(
+                        [
+                            data['residue', et, 'residue'].edge_index
+                            for et in edge_types_to_merge
+                        ],
+                        dim=1,
+                    ),
+                    sorted=False,
+                    dim=1,
+                )
+
+                diff_set = torch.tensor(list(
+                    set(
+                        (edge[0].item(), edge[1].item()) for edge in data['residue', 'backbone', 'residue'].edge_index.T
+                    ) - set(
+                        (edge[0].item(), edge[1].item()) for edge in data['residue', 'merged', 'residue'].edge_index.T
+                    )
+                ))
+
+                data[
+                    'residue', 'backbone-complementary', 'residue'
+                ].edge_index = (
+                    diff_set.T
+                    if diff_set.numel()
+                    else torch.empty(2,0, dtype=torch.int64)
+                )
+
+                # remove merged edge types
+                for et in edge_types_to_merge:
+                    del data['residue', et, 'residue']
 
             '''
             ### ADD PREDICTED B-FACTORS AS NODE ATTRIBUTES
@@ -615,17 +675,17 @@ class Dataset(pyg.data.Dataset):
 
 if __name__ == '__main__':
 
-    set_name = 'DeepSTABp-all (raw)'
+    set_name = 'sandbox_4'
     metafile = f'stats - {set_name}/metadata - {set_name}.csv'
 
-    edge_policy = '1CONT'
+    edge_policy = '5N'
     thresholds = {
         'contact': '12',
         'codir': edge_policy,
         'coord': edge_policy,
         'deform': edge_policy,
     }
-    dataset_version = 'v8-final_build'
+    dataset_version = 'v7a'
     embedding = 'prottrans'
 
     # include_edge_weights = any([t == 'NONE' for t in thresholds.values()])
@@ -636,20 +696,46 @@ if __name__ == '__main__':
 
     print(meta[0])
 
-    test_set = Dataset(
+    ds = Dataset(
         meta_file=metafile,
-        version=dataset_version,
         sequence_embedding=embedding,
         thresholds=thresholds,
-        structure_source='AlphaFold',
-        include_edge_weights=False,
-        time_limit=60,
+        merge_edge_types=True,
+        version=dataset_version,
+        time_limit=20,
         transform=None,
-        device=df_device,
+        device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
         entries_should_be_ready=False,
-        rebuild=False,
-        float16_embeddings=True,
+        rebuild=True
     )
 
-    print(len(test_set))
-    print(test_set[0])
+    print(len(ds))
+    print(ds[0])
+
+    # for d in pyg.loader.DataLoader(
+    #     ds,
+    #     batch_size=2,
+    #     shuffle=False,
+    #     num_workers=1,
+    #     # worker_init_fn=seed_worker,
+    #     # generator=rand_gen,
+    # ):
+    #     print(d)
+    #     break
+
+    # np.savetxt(
+    #     f'stats - {set_name}/processable_accessions.txt',
+    #     ds.processable_accessions,
+    #     fmt='%s',
+    # )
+
+    # meta_processable = []
+    # for acc in ds.processable_accessions:
+    #     meta_processable.append(meta[meta[:, 0] == acc[:-5]][0])
+
+    # np.savetxt(
+    #     f'stats - {set_name}/metadata - {set_name.replace("raw", "processable")}.csv',
+    #     meta_processable,
+    #     fmt='%s',
+    #     delimiter=',',
+    # )
