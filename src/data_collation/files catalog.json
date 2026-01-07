@@ -1,0 +1,86 @@
+{
+  "Oleispira antarctica_RB-8_lysate_R1": [
+    3,
+    "Oleispira antarctica"
+  ],
+  "Caenorhabditis elegans lysate": [
+    20,
+    "Caenorhabditis elegans"
+  ],
+  "Arabidopsis thaliana seedling lysate": [
+    22,
+    "Arabidopsis thaliana"
+  ],
+  "Drosophila melanogaster SII lysate": [
+    25,
+    "Drosophila melanogaster"
+  ],
+  "Danio rerio Zenodo lysate": [
+    28,
+    "Danio rerio"
+  ],
+  "Saccharomyces cerevisiae lysate": [
+    32,
+    "Saccharomyces cerevisiae"
+  ],
+  "Saccharomyces cerevisiae cell": [
+    32,
+    "Saccharomyces cerevisiae"
+  ],
+  "Bacillus subtilis_168_lysate_R1": [
+    37,
+    "Bacillus subtilis"
+  ],
+  "Escherichia coli cells": [
+    37,
+    "Escherichia coli"
+  ],
+  "Escherichia coli lysate": [
+    37,
+    "Escherichia coli"
+  ],
+  "Homo sapiens Jurkat cells": [
+    37,
+    "Homo sapiens"
+  ],
+  "Homo sapiens K562 cells": [
+    37,
+    "Homo sapiens"
+  ],
+  "Homo sapiens K562 cells_Thermal_proximity_coaggregationhermal_proximity_coaggregation": [
+    37,
+    "Homo sapiens"
+  ],
+  "Homo sapiens K562 lysate": [
+    37,
+    "Homo sapiens"
+  ],
+  "Homo sapiens K562 lysate_Thermal_proximity_coaggregationhermal_proximity_coaggregation": [
+    37,
+    "Homo sapiens"
+  ],
+  "Mus musculus BMDC lysate": [
+    37,
+    "Mus musculus"
+  ],
+  "Mus musculus liver lysate": [
+    37,
+    "Mus musculus"
+  ],
+  "Geobacillus stearothermophilus NCA26 lysate": [
+    55,
+    "Geobacillus stearothermophilus"
+  ],
+  "Picrophilus torridus DSM9790 lysate": [
+    60,
+    "Picrophilus torridus"
+  ],
+  "Thermus thermophilus HB27 cells": [
+    70,
+    "Thermus thermophilus"
+  ],
+  "Thermus thermophilus HB27 lysate": [
+    70,
+    "Thermus thermophilus"
+  ]
+}
